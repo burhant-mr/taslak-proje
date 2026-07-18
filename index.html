@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mutlu Yıllar!</title>
+    
+    <!-- Google Fonts el yazısı ve modern font yüklemesi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        /* Genel Sayfa Ayarları */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #120917; /* Siyaha çalan derin mor */
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            padding: 20px;
+        }
+
+        /* Zarf Kapsayıcısı */
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            margin-top: 60px;
+        }
+
+        /* GÖRÜNMEZ TIKLAMA KALKANI (Mobildeki tıklama sorununu çözen parça) */
+        .click-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20; /* Her şeyin en üstünde durur, dokunmayı kesin algılar */
+        }
+
+        /* Zarfın Kendisi */
+        .envelope {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            background-color: #27162f; 
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Zarfın Önündeki Yazı */
+        .front-text {
+            position: absolute;
+            top: 70%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #e5c158; 
+            font-family: 'Caveat', cursive; 
+            font-size: 26px; 
+            font-weight: 700; 
+            text-align: center;
+            width: 100%;
+            z-index: 10;
+            transition: opacity 0.3s ease;
+            padding: 0 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Zarfın Üst Kapağı */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #1f1025; 
+            transform-origin: top;
+            transition: transform 0.4s ease 0.2s, z-index 0.2s ease 0.2s;
+            z-index: 5;
+        }
+
+        /* Zarfın Ön Cepleri */
+        .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-left: 140px solid #2e1a37;
+            border-right: 140px solid #2e1a37;
+            border-bottom: 95px solid #291731;
+            z-index: 4;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* İçinden Çıkacak Kart */
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 260px;
+            height: 160px;
+            background-color: #ffffff; 
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #e5c158; 
+        }
+
+        /* Kartın İçindeki Mesaj */
+        .words {
+            color: #27162f; 
+            text-align: center;
+            font-family: 'Caveat', cursive; 
+            font-size: 24px; 
+            font-weight: 700; 
+            line-height: 1.3;
+        }
+
+        /* Zarfın Altındaki İpucu Yazısı */
+        .hint-text {
+            margin-top: 30px;
+            color: #a38ba9; 
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            text-align: center;
+            animation: float 2s ease-in-out infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* SİMLER / PARILTILAR */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #e5c158; 
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 25; /* Simler kalkanın da üstünde uçsun */
+            box-shadow: 0 0 8px #e5c158;
+            animation: flyOut 0.8s ease-out forwards;
+        }
+
+        @keyframes flyOut {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* ANIMASYONLAR */
+        .envelope.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-100px);
+            z-index: 3;
+            transition-delay: 0.4s;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .envelope.open .front-text {
+            opacity: 0.05; 
+        }
+
+        .envelope.open + .hint-text {
+            opacity: 0;
+        }
+
+        /* Büyük Ekranlar İçin Boyut Ayarları */
+        @media (min-width: 600px) {
+            .envelope { width: 300px; height: 200px; }
+            .flap { border-left-width: 150px; border-right-width: 150px; border-top-width: 110px; }
+            .pocket { border-left-width: 150px; border-right-width: 150px; border-bottom-width: 100px; }
+            .letter { width: 270px; height: 170px; left: 15px; }
+            .envelope.open .letter { transform: translateY(-110px); }
+            .front-text { font-size: 28px; top: 70%; }
+            .words { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="envelope-wrapper">
+        <!-- Bu görünmez katman dokunmayı yakalar ve animasyonu tetikler -->
+        <div class="click-layer" onclick="toggleEnvelope()"></div>
+        
+        <div class="envelope" id="myEnvelope">
+            <div class="front-text">Doğum Günün Kutlu Olsun Esma 🥳 </div>
+            <div class="flap"></div>
+            <div class="pocket"></div>
+            <div class="letter">
+                <div class="words">
+                    Yeni yaşın sana sevdiklerinle birlikte sağlık ve mutluluk getirsin.
+                </div>
+            </div>
+        </div>
+        <div class="hint-text">Zarfa Dokun ✨</div>
+    </div>
+
+    <script>
+        function toggleEnvelope() {
+            const envelope = document.getElementById('myEnvelope');
+            
+            if (!envelope.classList.contains('open')) {
+                createSparkles();
+            }
+            
+            envelope.classList.toggle('open');
+        }
+
+        function createSparkles() {
+            const wrapper = document.querySelector('.envelope-wrapper');
+            const particleCount = 40; 
+
+            for (let i = 0; i < particleCount; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+
+                sparkle.style.left = '50%';
+                sparkle.style.top = '40%';
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 150 + 50; 
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+
+                sparkle.style.setProperty('--x', `${x}px`);
+                sparkle.style.setProperty('--y', `${y}px`);
+
+                const size = Math.random() * 5 + 3; 
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+
+                wrapper.appendChild(sparkle);
+
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 800);
+            }
+        }
+    </script>
+</body>
+</html>
